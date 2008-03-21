@@ -25,9 +25,9 @@ describe <%= class_name %> do
       @<%= file_name %>.reload.activation_code.should_not be_nil
     end
 <% end %><% if options[:stateful] %>
-    it 'starts in pending state' do
+    it 'starts in passive state' do
       @creating_<%= file_name %>.call
-      @<%= file_name %>.should be_pending
+      @<%= file_name %>.should be_passive
     end
 <% end %>  end
 

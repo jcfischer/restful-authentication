@@ -1,6 +1,8 @@
 class <%= model_controller_class_name %>Controller < ApplicationController
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
+  
+  skip_before_filter :login_required, :only => [:new, :create, :activate]
   <% if options[:stateful] %>
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
@@ -18,8 +20,10 @@ class <%= model_controller_class_name %>Controller < ApplicationController
     # uncomment at your own risk
     # reset_session
     @<%= file_name %> = <%= class_name %>.new(params[:<%= file_name %>])
-    @<%= file_name %>.<% if options[:stateful] %>register! if @<%= file_name %>.valid?<% else %>save<% end %>
+    @<%= file_name %>.save
     if @<%= file_name %>.errors.empty?
+      <% if options[:stateful] %>@<%= file_name %>.register!<% end %>
+      
       self.current_<%= file_name %> = @<%= file_name %>
       redirect_back_or_default('/')
       flash[:notice] = "Thanks for signing up!"

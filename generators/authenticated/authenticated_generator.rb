@@ -197,9 +197,7 @@ class AuthenticatedGenerator < Rails::Generator::NamedBase
         if options[:include_activation]
           puts "    map.activate '/activate/:activation_code', :controller => '#{model_controller_file_name}', :action => 'activate'"
           puts
-          puts "  - add an observer to config/environment.rb"
-          puts "    config.active_record.observers = :#{file_name}_observer"
-          puts
+          puts %w(map.resources :#{model_controller_file_name}, :member => { :activate => :get })
         end
         if options[:stateful]
           puts "Also, don't forget to install the acts_as_state_machine plugin and set your resource:"

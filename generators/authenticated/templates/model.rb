@@ -17,9 +17,9 @@ class <%= class_name %> < ActiveRecord::Base
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :password, :password_confirmation
 <% if options[:stateful] %>
-  acts_as_state_machine :initial => :pending
+  acts_as_state_machine :initial => :passive
   state :passive
-  state :pending, :enter => :make_activation_code
+  state :pending, :enter => :do_pending
   state :active,  :enter => :do_activate
   state :suspended
   state :deleted, :enter => :do_delete
@@ -134,8 +134,13 @@ class <%= class_name %> < ActiveRecord::Base
       self.deleted_at = Time.now.utc
     end
 
+    def do_pending
+      make_activation_code
+      <%= class_name %>Mailer.deliver_signup_notification(self)
+    end
     def do_activate
       self.activated_at = Time.now.utc
       self.deleted_at = self.activation_code = nil
+      <%= class_name %>Mailer.deliver_activation(self) 
     end<% end %>
 end
